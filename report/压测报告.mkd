@@ -1,0 +1,91 @@
+压测报告
+======
+##测试目的
+>对比vector service中两种不同压缩策略的执行效率
+****
+##测试环境  
+###测试服务器参数
+>IP: 10.77.109.117  
+>CPU: Intel(R) Xeon(R) CPU E5645  @ 2.40GHz * 12  
+>RAM: 12G 98% used  
+>OS Version: CentOS release 6.4 (Final)
+###Redis单例信息
+```
+redis_version:2.4.20
+redis_release:3
+redis_git_sha1:28148800
+redis_git_dirty:1
+arch_bits:64
+multiplexing_api:epoll
+gcc_version:4.4.7
+process_id:25249
+uptime_in_seconds:2317
+uptime_in_days:0
+lru_clock:446133
+used_cpu_sys:131.52
+used_cpu_user:2217.25
+used_cpu_sys_children:0.00
+used_cpu_user_children:0.00
+connected_clients:51
+connected_slaves:0
+client_longest_output_list:0
+client_biggest_input_buf:4
+blocked_clients:0
+used_memory:315141696
+used_memory_human:300.54M
+used_memory_rss:330047488
+used_memory_peak:341028848
+used_memory_peak_human:325.23M
+mem_fragmentation_ratio:1.05
+mem_allocator:jemalloc-3.2.0
+loading:0
+aof_enabled:1
+pending_aofbuf_length:0
+changes_since_last_save:378722567
+bgsave_in_progress:0
+last_save_time:1409550861
+bgrewriteaof_in_progress:0
+total_connections_received:403
+total_commands_processed:7424141
+total_read_requests:0
+total_write_requests:8834098
+total_slow_queries:0
+expired_keys:0
+evicted_keys:0
+keyspace_hits:5272027
+keyspace_misses:0
+pubsub_channels:0
+pubsub_patterns:0
+latest_fork_usec:0
+vm_enabled:0
+role:master
+upgrade_stat:start-server-succ
+aof_current_fileid:12
+aof_current_size:294012383
+aof_pending_rewrite:0
+aof_buffer_length:0
+db0:keys=110004,expires=0
+list schema stat info:
+schema test_schema {
+	getCount  :0 
+	setCount  :5382030 
+	delCount  :0 
+	hitCount  :0 
+	missCount :0 
+	errCount  :3452067 
+}
+db_total_keys:110004
+db_total_expireds:0
+
+```
+****
+##3种写命令对比分析
+>分别对三种命令执行如下benchmark命令，即模拟50个并行连接共执行100万条指令。
+>其中，每条指令分别包含1 45 100 200 300 400 500 1000 15000个id flags。
+>>redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -c 50 -t v***  
+
+
+###vadd
+###vrem
+###vremrange
+****
