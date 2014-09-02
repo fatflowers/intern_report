@@ -93,6 +93,7 @@ db_total_expireds:0
 
 ###vadd
 >执行了5次的vadd测试，下面的数据是5次测试的平均值。
+>>./redis-benchmark -h 127.0.0.1 -p 6379 -n 100000 -r 100000000 -c 50 -t vadd
 ###vrem
 >* 对vrem测试需要特定的id_meta，所以在测试vrem前先用vadd插入对应数量的id_meta，这样保证了测试的准确性
 
