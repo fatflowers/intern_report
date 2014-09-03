@@ -16,9 +16,9 @@
 3. 进行对比压测，通过benchmark对比vector service两种压缩方式的性能[压测报告](https://github.com/sunlei99/intern_report/blob/master/report/%E5%8E%8B%E6%B5%8B%E6%8A%A5%E5%91%8A.mkd)。
 
 **********
-* **仿真程序**
-基于redis-py为vector service开发仿真程序[[firehose-importer](https://github.com/git-hulk/python-vector-reader/tree/master/firehose-importer)  ]
-将firhose中的微博数据导入到redis中，解决了长连接定时断开的问题。
+* **仿真程序**：　[[firehose-importer](https://github.com/git-hulk/python-vector-reader/tree/master/firehose-importer)  ]
+
+基于redis-py为vector service开发仿真程序，将firhose中的微博数据导入到redis中，解决了长连接定时断开的问题。
 已经完成了主要框架的编码，后续需要将firehose中的数据映射为各种vector service的命令。
 
 **********
