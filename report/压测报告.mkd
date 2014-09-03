@@ -1,21 +1,118 @@
+
+[TOC]
+
 压测报告
 ======
 ##测试目的
->对比vector service中两种不同压缩策略的执行效率，主要测试三种写命令（vadd vrem vremrange）的执行效率对比
+通过测试三种写命令（vadd vrem vremrange）的执行效率对比vector service中两种不同压缩策略的执行效率
+
 ****
 ##测试原理
->对benchmark进行改造  
->分别对三种命令执行如下benchmark命令，即模拟50个并行连接对每种命令共执行10万条指令。  
->其中，各种指令分别包含1 45 100 200 300 400 500 1000 15000个id flags。
->>redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -c 50 -t v***  
+对benchmark进行改造，三种命令的测试分别依赖于[redis-benchmark.c](https://github.com/sunlei99/intern_report/blob/master/report/redis-benchmark.c)中的`vaddBenchTest`，`vremBenchTest`和`vremrangeBenchTest`函数。
+
+每种命令的测试分别包含1 45 100 200 300 400 500 1000 15000个id flags。
+
+>`redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -r 100000 -c 50 -t v***  `
+
 ****
-##测试环境  
+##测试环境
 ###测试服务器参数
->IP: 10.77.109.117  
->CPU: Intel(R) Xeon(R) CPU E5645  @ 2.40GHz * 12  
->RAM: 12G 98% used  
->OS Version: CentOS release 6.4 (Final)
+```
+IP: 10.77.109.117
+
+CPU: Intel(R) Xeon(R) CPU E5645  @ 2.40GHz * 12
+
+RAM: 12G 98% used
+
+OS Version: CentOS release 6.4 (Final)
+```
 ###Redis单例信息
+####master版
+```
+redis_version:2.4.20
+redis_release:3
+redis_git_sha1:167a3e49
+redis_git_dirty:1
+arch_bits:64
+multiplexing_api:epoll
+gcc_version:4.4.7
+process_id:26964
+uptime_in_seconds:5523
+uptime_in_days:0
+lru_clock:462565
+used_cpu_sys:46.57
+used_cpu_user:488.68
+used_cpu_sys_children:0.00
+used_cpu_user_children:0.00
+connected_clients:8
+connected_slaves:0
+client_longest_output_list:0
+client_biggest_input_buf:0
+blocked_clients:0
+used_memory:1884463824
+used_memory_human:1.76G
+used_memory_rss:1903308800
+used_memory_peak:1891201864
+used_memory_peak_human:1.76G
+mem_fragmentation_ratio:1.01
+mem_allocator:jemalloc-3.2.0
+loading:0
+aof_enabled:1
+pending_aofbuf_length:0
+changes_since_last_save:53666887
+bgsave_in_progress:0
+last_save_time:1409711971
+bgrewriteaof_in_progress:0
+total_connections_received:2502
+total_commands_processed:2177577
+total_read_requests:124902
+total_write_requests:2052672
+total_slow_queries:0
+expired_keys:0
+evicted_keys:0
+keyspace_hits:62064674
+keyspace_misses:14508
+pubsub_channels:0
+pubsub_patterns:0
+latest_fork_usec:0
+vm_enabled:0
+role:master
+upgrade_stat:start-server-succ
+aof_current_fileid:10
+aof_current_size:161275949
+aof_pending_rewrite:0
+aof_buffer_length:0
+db0:keys=5544731,expires=0
+list schema stat info:
+schema s0 {
+	getCount  :15376859 
+	setCount  :61554 
+	delCount  :0 
+	hitCount  :15369873 
+	missCount :6986 
+	errCount  :0 
+}
+schema s1 {
+	getCount  :15367297 
+	setCount  :61800 
+	delCount  :0 
+	hitCount  :15359775 
+	missCount :7522 
+	errCount  :0 
+}
+schema test_schema {
+	getCount  :0 
+	setCount  :410000 
+	delCount  :10000 
+	hitCount  :0 
+	missCount :0 
+	errCount  :500000 
+}
+db_total_keys:5544731
+db_total_expireds:0
+
+```
+####rover_compaction_V2_20140709版
 ```
 redis_version:2.4.20
 redis_release:3
@@ -24,78 +121,93 @@ redis_git_dirty:1
 arch_bits:64
 multiplexing_api:epoll
 gcc_version:4.4.7
-process_id:25249
-uptime_in_seconds:2317
+process_id:26900
+uptime_in_seconds:6076
 uptime_in_days:0
-lru_clock:446133
-used_cpu_sys:131.52
-used_cpu_user:2217.25
+lru_clock:462570
+used_cpu_sys:45.98
+used_cpu_user:441.72
 used_cpu_sys_children:0.00
 used_cpu_user_children:0.00
-connected_clients:51
+connected_clients:8
 connected_slaves:0
 client_longest_output_list:0
-client_biggest_input_buf:4
+client_biggest_input_buf:0
 blocked_clients:0
-used_memory:315141696
-used_memory_human:300.54M
-used_memory_rss:330047488
-used_memory_peak:341028848
-used_memory_peak_human:325.23M
-mem_fragmentation_ratio:1.05
+used_memory:2416936512
+used_memory_human:2.25G
+used_memory_rss:2430554112
+used_memory_peak:2417362088
+used_memory_peak_human:2.25G
+mem_fragmentation_ratio:1.01
 mem_allocator:jemalloc-3.2.0
 loading:0
 aof_enabled:1
 pending_aofbuf_length:0
-changes_since_last_save:378722567
+changes_since_last_save:53735811
 bgsave_in_progress:0
-last_save_time:1409550861
+last_save_time:1409711468
 bgrewriteaof_in_progress:0
-total_connections_received:403
-total_commands_processed:7424141
-total_read_requests:0
-total_write_requests:8834098
+total_connections_received:3574
+total_commands_processed:2141744
+total_read_requests:76088
+total_write_requests:2070833
 total_slow_queries:0
 expired_keys:0
 evicted_keys:0
-keyspace_hits:5272027
-keyspace_misses:0
+keyspace_hits:791171
+keyspace_misses:49
 pubsub_channels:0
 pubsub_patterns:0
 latest_fork_usec:0
 vm_enabled:0
 role:master
 upgrade_stat:start-server-succ
-aof_current_fileid:12
-aof_current_size:294012383
+aof_current_fileid:8
+aof_current_size:577143344
 aof_pending_rewrite:0
 aof_buffer_length:0
-db0:keys=110004,expires=0
+db0:keys=4873154,expires=0
 list schema stat info:
+schema s0 {
+	getCount  :41661 
+	setCount  :67493 
+	delCount  :0 
+	hitCount  :41635 
+	missCount :26 
+	errCount  :0 
+}
+schema s1 {
+	getCount  :41814 
+	setCount  :67857 
+	delCount  :0 
+	hitCount  :41791 
+	missCount :23 
+	errCount  :0 
+}
 schema test_schema {
 	getCount  :0 
-	setCount  :5382030 
+	setCount  :410000 
 	delCount  :0 
 	hitCount  :0 
 	missCount :0 
-	errCount  :3452067 
+	errCount  :500000 
 }
-db_total_keys:110004
+db_total_keys:4873154
 db_total_expireds:0
 
 ```
 ****
 ##3种写命令对比分析
->分别对三种命令执行如下benchmark命令，即模拟50个并行连接对每种命令共执行10万条指令。
->其中，各种指令分别包含1 45 100 200 300 400 500 1000 15000个id flags。
->>redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -c 50 -t v***  
+分别对三种命令执行如下benchmark命令，即模拟50个并行连接对每种命令共执行10万条指令。
+其中，各种指令分别包含1 45 100 200 300 400 500 1000 15000个id flags。
+>`redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -c 50 -t v***`
 
 
 ###vadd
->执行了5次的vadd测试，下面的数据是5次测试的平均值。
->>./redis-benchmark -h 127.0.0.1 -p 6379 -n 100000 -r 100000000 -c 50 -t vadd
+下面数据是通过执行10万次vadd命令得到：
+![vadd命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vadd%E5%91%BD%E4%BB%A4%E5%AF%B9%E6%AF%94.jpg)
 ###vrem
-./redis-benchmark -h 127.0.0.1 -p 6379 -n 100000 -r 100000 -c 50 -t vrem
 >* 对vrem测试需要特定的id_meta，所以在测试vrem前先用vadd插入对应数量的id_meta，这样保证了测试的准确性
 
 >vrem测试共进行了三次，对最终的结果取平均值。
