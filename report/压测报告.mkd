@@ -209,10 +209,11 @@ db_total_expireds:0
 ###vadd
 下面数据是通过执行10万次vadd命令得到：
 
-<!--![vadd命令对比](../pic/vadd命令对比.jpg)
-![vadd命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vadd%E5%91%BD%E4%BB%A4%E5%AF%B9%E6%AF%94.jpg)-->
+<!--![vadd命令对比](../pic/vadd命令对比.jpg)-->
+![vadd命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vadd%E5%91%BD%E4%BB%A4%E5%AF%B9%E6%AF%94.jpg)
 
 由此图可知两种版本的redis在vadd命令的表现上很相近，每秒最多支持插入id flags（性能瓶颈）的对数为120万条左右。
+
 <!--![两种版本vadd性能差值](../pic/两种版本vadd性能差值.jpg)-->
 ![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvadd%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
 
@@ -224,19 +225,19 @@ db_total_expireds:0
 ![vrem命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vrem%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.jpg)
 
 <!--![两种版本vadd性能差值](../pic/两种版本vrem性能差值.jpg)-->
-![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvadd%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
+![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvrem%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
 
 由以上两图可知两种版本在执行vrem命令时性能相近，从性能差值图可知两种版本间在执行vrem命令时的性能差值相差较小，但rover_compaction_V2_20140709版稍微占优势。
 
 
 ###vremrange
-下面数据是通过执行10万次vrem命令得到：
+下面数据是通过执行10万次vremrange命令得到：
 
-<!--![vrem命令对比](../pic/vremrange性能对比.jpg)-->
-![vrem命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vrem%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.jpg)
+<!--![vremrange命令对比](../pic/vremrange性能对比.jpg)-->
+![vremrange命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vremrange%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.jpg)
 
-<!--![两种版本vadd性能差值](../pic/两种版本vremrange性能差值.jpg)-->
-![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvadd%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
+<!--![两种版本vremrange性能差值](../pic/两种版本vremrange性能差值.jpg)-->
+![两种版本vremrange性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvremrange%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
 ****
 ##结论
 * 两种压缩策略性能基本相近
