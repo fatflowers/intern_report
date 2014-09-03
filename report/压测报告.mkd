@@ -23,7 +23,7 @@ vector service中将未完全利用的slab放入partial queue中，在对partial
 
 ****
 ##测试环境
-两个版本的redis服务器执行[压测程序](https://github.com/git-hulk/python-vector-reader/tree/master/compaction_stress_test)20天，数据库中有约400万个key。
+两个版本的redis服务器执行[压测程序](https://github.com/git-hulk/python-vector-reader/tree/master/compaction_stress_test)20天，数据库中有约500万个key。
 ###测试服务器参数
 ```
 IP: 10.77.109.117
