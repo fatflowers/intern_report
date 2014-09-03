@@ -607,12 +607,13 @@ void prepareDataForVdel(int total, int itemCount){
  * @startId  : id of idmeta start from startId
  * @idmetaNum: how many idmetas to add
  **/
+#define VADD_SCHEMA "vadd_schema"
 static void vaddBenchTest(char *title, long startId, int idmetaNum){
     int i, len;
     char *cmd;
 
     sds viKey = sdsnew("vadd");
-    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum, DEFAULT_SCHEMA);
+    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum, VADD_SCHEMA);
     for(i = 0; i < idmetaNum; i++){
         viKey = sdscatprintf(viKey, " %lu %d ", startId+randNum(10000000), idmetaNum);
     } 
@@ -622,26 +623,26 @@ static void vaddBenchTest(char *title, long startId, int idmetaNum){
     sdsfree(viKey);
     free(cmd);
 }
+#define VREM_SCHEMA "vrem_schema"
 static void vremBenchTest(char *title, long startId, int idmetaNum){
 	// add before rem, same key and same idmeta for vadd and vrem.
 	int i, len;
     char *cmd;
 	sds viKey = sdsnew("vadd");
-    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum, DEFAULT_SCHEMA);
+    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum, VREM_SCHEMA);
     for(i = 0; i < idmetaNum; i++){
         viKey = sdscatprintf(viKey, " %lu %d ", startId+i, idmetaNum);
     }
     len = redisFormatCommand(&cmd, viKey);
 	sds buf = sdsnew(title);
 	buf = sdscatprintf(buf, " %s %d", "vadd", idmetaNum);
-	len = redisFormatCommand(&cmd, viKey);
 	benchmark(buf, cmd, len);
 	sdsfree(viKey);
 	sdsfree(buf);
 	free(cmd);
 
     viKey = sdsnew("vrem");
-    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum, DEFAULT_SCHEMA);
+    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum, VREM_SCHEMA);
     for(i = 0; i < idmetaNum; i++){
         viKey = sdscatprintf(viKey, " %lu", startId+i);
     }
@@ -651,20 +652,21 @@ static void vremBenchTest(char *title, long startId, int idmetaNum){
     sdsfree(viKey);
     free(cmd);
 }
+#define VREMRANGE_SCHEMA "vremrange_schema"
 static void vremrangeBenchTest(char *title, long startId, int idmetaNum){
 	// add before rem, same key and same idmeta for vadd and vrem.
 	int i, len;
     char *cmd;
 	sds viKey = sdsnew("vadd");
 	// use idmetaNum + idmetaNum to avoid influence from previous test
-    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum + idmetaNum, DEFAULT_SCHEMA);
-    for(i = 0; i < idmetaNum; i++){
-        viKey = sdscatprintf(viKey, " %lu %d ", startId+randNum(100000), idmetaNum);
-    }
-    len = redisFormatCommand(&cmd, viKey);
+    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s ", idmetaNum + idmetaNum, VREMRANGE_SCHEMA);
+	for(i = 0; i < idmetaNum; i++){
+		viKey = sdscatprintf(viKey, " %lu %d ", startId+randNum(100000), idmetaNum);
+	}
+	
+	len = redisFormatCommand(&cmd, viKey);
 	sds buf = sdsnew(title);
 	buf = sdscatprintf(buf, " %s %d", "vadd", idmetaNum);
-	len = redisFormatCommand(&cmd, viKey);
 	benchmark(buf, cmd, len);
 	sdsfree(viKey);
 	sdsfree(buf);
@@ -672,7 +674,7 @@ static void vremrangeBenchTest(char *title, long startId, int idmetaNum){
 
 
     viKey = sdsnew("vremrange");
-    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s -1 -1 ", idmetaNum + idmetaNum, DEFAULT_SCHEMA);
+    viKey = sdscatprintf(viKey, "  _vi%d_:rand:000000000000.%s -1 -1 ", idmetaNum + idmetaNum, VREMRANGE_SCHEMA);
     len = redisFormatCommand(&cmd, viKey);
 
     benchmark(title, cmd, len);
@@ -914,88 +916,61 @@ int main(int argc, const char **argv) {
             vaddBenchTest("VADD 1 IdMeta ", 40000000000000000, 1);
         }
                                 
-        if(test_is_selected("vadd") || test_is_selected("vadd_45")){
-            vaddBenchTest("VADD 45 IdMeta ", 50000000000000000, 45);
+        if(test_is_selected("vadd") || test_is_selected("vadd_40")){
+            vaddBenchTest("VADD 40 IdMeta ", 50000000000000000, 40);
         }
-        if(test_is_selected("vadd") || test_is_selected("vadd_100")){
-            vaddBenchTest("VADD 100 IdMeta ",60000000000000000, 100);
+        if(test_is_selected("vadd") || test_is_selected("vadd_80")){
+            vaddBenchTest("VADD 80 IdMeta ", 50000000000000000, 80);
+        }
+        if(test_is_selected("vadd") || test_is_selected("vadd_120")){
+            vaddBenchTest("VADD 120 IdMeta ",60000000000000000, 120);
+        }
+        if(test_is_selected("vadd") || test_is_selected("vadd_160")){
+            vaddBenchTest("VADD 160 IdMeta ",60000000000000000, 160);
         }
         if(test_is_selected("vadd") || test_is_selected("vadd_200")){
             vaddBenchTest("VADD 200 IdMeta ",60000000000000000, 200);
         }
-        if(test_is_selected("vadd") || test_is_selected("vadd_300")){
-            vaddBenchTest("VADD 300 IdMeta ",60000000000000000, 300);
-        }
-	if(test_is_selected("vadd") || test_is_selected("vadd_400")){
-            vaddBenchTest("VADD 400 IdMeta ",60000000000000000, 400);
-        }
-        if(test_is_selected("vadd") || test_is_selected("vadd_500")){
-            vaddBenchTest("VADD 500 IdMeta ",60000000000000000, 500);
-        }
-        if(test_is_selected("vadd") || test_is_selected("vadd_1000")){
-            vaddBenchTest("VADD 1000 IdMeta ",60000000000000000, 1000);
-        }
-        if(test_is_selected("vadd") || test_is_selected("vadd_1500")){
-            vaddBenchTest("VADD 1500 IdMeta ",60000000000000000, 1500);
-        }
+	// vrem
 	if(test_is_selected("vrem") || test_is_selected("vrem_1")){
 		vremBenchTest("VREM 1",60000000000000000, 1);
 	}
-
-	if(test_is_selected("vrem") || test_is_selected("vrem_45")){
-		vremBenchTest("VREM 45",60000000000000000, 45);
+	if(test_is_selected("vrem") || test_is_selected("vrem_40")){
+		vremBenchTest("VREM 40",60000000000000000, 40);
 	}
-	if(test_is_selected("vrem") || test_is_selected("vrem_100")){
-		vremBenchTest("VREM 100",60000000000000000, 100);
+	if(test_is_selected("vrem") || test_is_selected("vrem_80")){
+		vremBenchTest("VREM 80",60000000000000000, 80);
+	}
+	if(test_is_selected("vrem") || test_is_selected("vrem_120")){
+		vremBenchTest("VREM 120",60000000000000000, 120);
+	}
+	if(test_is_selected("vrem") || test_is_selected("vrem_160")){
+		vremBenchTest("VREM 160",60000000000000000, 160);
 	}
 	if(test_is_selected("vrem") || test_is_selected("vrem_200")){
 		vremBenchTest("VREM 200",60000000000000000, 200);
-	}
-	if(test_is_selected("vrem") || test_is_selected("vrem_300")){
-		vremBenchTest("VREM 300",60000000000000000, 300);
-	}
-	if(test_is_selected("vrem") || test_is_selected("vrem_400")){
-		vremBenchTest("VREM 400",60000000000000000, 400);
-	}
-	if(test_is_selected("vrem") || test_is_selected("vrem_500")){
-		vremBenchTest("VREM 500",60000000000000000, 500);
-	}
-	if(test_is_selected("vrem") || test_is_selected("vrem_1000")){
-		vremBenchTest("VREM 1000",60000000000000000, 1000);
-	}
-	if(test_is_selected("vrem") || test_is_selected("vrem_1500")){
-		vremBenchTest("VREM 1500",60000000000000000, 1500);
 	}
 
 	// vremrange
 	if(test_is_selected("vremrange") || test_is_selected("vremrange_1")){
 		vremrangeBenchTest("VREMRANGE 1",60000000000000000, 1);
 	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_45")){
-		vremrangeBenchTest("VREMRANGE 45",60000000000000000, 45);
+	if(test_is_selected("vremrange") || test_is_selected("vremrange_40")){
+		vremrangeBenchTest("VREMRANGE 40",60000000000000000, 40);
 	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_100")){
-		vremrangeBenchTest("VREMRANGE 100",60000000000000000, 100);
+	if(test_is_selected("vremrange") || test_is_selected("vremrange_80")){
+		vremrangeBenchTest("VREMRANGE 80",60000000000000000, 80);
+	}
+	if(test_is_selected("vremrange") || test_is_selected("vremrange_120")){
+		vremrangeBenchTest("VREMRANGE 120",60000000000000000, 120);
+	}
+	if(test_is_selected("vremrange") || test_is_selected("vremrange_160")){
+		vremrangeBenchTest("VREMRANGE 160",60000000000000000, 160);
 	}
 	if(test_is_selected("vremrange") || test_is_selected("vremrange_200")){
 		vremrangeBenchTest("VREMRANGE 200",60000000000000000, 200);
 	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_300")){
-		vremrangeBenchTest("VREMRANGE 300",60000000000000000, 300);
-	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_400")){
-		vremrangeBenchTest("VREMRANGE 400",60000000000000000, 400);
-	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_500")){
-		vremrangeBenchTest("VREMRANGE 500",60000000000000000, 500);
-	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_1000")){
-		vremrangeBenchTest("VREMRANGE 1000",60000000000000000, 1000);
-	}
-	if(test_is_selected("vremrange") || test_is_selected("vremrange_1500")){
-		vremrangeBenchTest("VREMRANGE 1500",60000000000000000, 1500);
-	}
-        if(test_is_selected("vtest") || test_is_selected("vremrange")){
+        if(test_is_selected("vtest") || test_is_selected("vremrange_o")){
             prepareDataForVdel(10000, 200);
             len = redisFormatCommand(&cmd, "vremrange delkey:rand:000000000000.%s -1 -1", DEFAULT_SCHEMA);
             benchmark("VREMRANGE All",cmd,len);
