@@ -8,7 +8,6 @@
 
 **********
 * **压测相关工作**:    [[python-vector-reader](https://github.com/git-hulk/python-vector-reader)  ]
-
 1. 为python版redis客户端redis-py添加vector service的接口[[client.py](https://github.com/git-hulk/python-vector-reader/blob/master/redis-py/redis/client.py)]
 为7条vector service程序添加支持，并为每条命令进行测试[[test_vector_commands.py](https://github.com/git-hulk/python-vector-reader/blob/master/redis-py/tests/test_vector_commands.py)]。
 2. 基于redis-py为vector service开发压测程序[[compaction_stress_test](https://github.com/git-hulk/python-vector-reader/tree/master/compaction_stress_test)]，找到并改正了一个bug。
@@ -17,7 +16,6 @@
 
 **********
 * **仿真程序**：[[firehose-importer](https://github.com/git-hulk/python-vector-reader/tree/master/firehose-importer)  ]
-
 基于redis-py为vector service开发仿真程序，将firhose中的微博数据导入到redis中，解决了长连接定时断开的问题。
 已经完成了主要框架的编码，后续需要将firehose中的数据映射为各种vector service的命令。
 
