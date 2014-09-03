@@ -5,8 +5,9 @@
 ======
 ##测试目的
 vector service中将未完全利用的slab放入partial queue中，在对partial queue进行压缩时有两种策略
+
 1. master版本， 维护按slab利用率有序的partial queue，每次压缩取partial queue中第一个和最后一个slab进行合并。
-2. rover_compaction_V2_20140709版本， 不对partial queue进行有序维护，每次压缩时遍历partial queue，找到利用率最大的和最小的slab进行合并。
+2. rover\_compaction\_V2\_20140709版本， 不对partial queue进行有序维护，每次压缩时遍历partial queue，找到利用率最大的和最小的slab进行合并。
 
 通过测试三种写命令（vadd vrem vremrange）的执行效率对比vector service中两种不同压缩策略的执行效率。
 
@@ -18,7 +19,7 @@ vector service中将未完全利用的slab放入partial queue中，在对partial
 
 >`redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -r 100000 -c 50 -t v***  `
 
-对vrem,vremrange测试需要redis中有足够的id_meta，所以在测试vrem,vremrange前先用vadd插入10万条id_meta，这样保证了测试的准确性。
+对vrem,vremrange测试需要redis中有足够的id\_meta，所以在测试vrem,vremrange前先用vadd插入10万条id_meta，这样保证了测试的准确性。
 
 ****
 ##测试环境
