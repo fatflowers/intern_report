@@ -1,23 +1,28 @@
 
-[TOC]
+<!--[TOC]-->
 
 压测报告
 ======
 ##测试目的
-通过测试三种写命令（vadd vrem vremrange）的执行效率对比vector service中两种不同压缩策略的执行效率
+vector service中将未完全利用的slab放入partial queue中，在对partial queue进行压缩时有两种策略
+1. master版本， 维护按slab利用率有序的partial queue，每次压缩取partial queue中第一个和最后一个slab进行合并。
+2. rover_compaction_V2_20140709版本， 不对partial queue进行有序维护，每次压缩时遍历partial queue，找到利用率最大的和最小的slab进行合并。
+
+通过测试三种写命令（vadd vrem vremrange）的执行效率对比vector service中两种不同压缩策略的执行效率。
 
 ****
 ##测试原理
 对benchmark进行改造，三种命令的测试分别依赖于[redis-benchmark.c](https://github.com/sunlei99/intern_report/blob/master/report/redis-benchmark.c)中的`vaddBenchTest`，`vremBenchTest`和`vremrangeBenchTest`函数。
 
-每种命令的测试分别包含1 45 100 200 300 400 500 1000 15000个id flags。
+每种命令的测试分别包含1 40 80 120 160 200个id flags。
 
 >`redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -r 100000 -c 50 -t v***  `
 
-对vrem测试需要redis中有足够的id_meta，所以在测试vrem前先用vadd插入10万条id_meta，这样保证了测试的准确性。
+对vrem,vremrange测试需要redis中有足够的id_meta，所以在测试vrem,vremrange前先用vadd插入10万条id_meta，这样保证了测试的准确性。
 
 ****
 ##测试环境
+两个版本的redis服务器执行[压测程序](https://github.com/git-hulk/python-vector-reader/tree/master/compaction_stress_test)20天，数据库中有约400万个key。
 ###测试服务器参数
 ```
 IP: 10.77.109.117
@@ -202,7 +207,7 @@ db_total_expireds:0
 ****
 ##3种写命令对比分析
 分别对三种命令执行如下benchmark命令，即模拟50个并行连接对每种命令共执行10万条指令。
-其中，各种指令分别包含1 45 100 200 300 400 500 1000 15000个id flags。
+其中，各种指令分别包含1 40 80 120 160 200个id flags。
 >`redis-benchmark -h 127.0.0.1 -p 6778 -n 100000 -c 50 -t v***`
 
 
@@ -212,22 +217,22 @@ db_total_expireds:0
 <!--![vadd命令对比](../pic/vadd命令对比.jpg)-->
 ![vadd命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vadd%E5%91%BD%E4%BB%A4%E5%AF%B9%E6%AF%94.jpg)
 
-由此图可知两种版本的redis在vadd命令的表现上很相近，每秒最多支持插入id flags（性能瓶颈）的对数为120万条左右。
+由此图可知两种版本的redis在vadd命令的表现上很相近，每秒最多支持插入id flags（性能瓶颈）的对数为40万条左右。
 
 <!--![两种版本vadd性能差值](../pic/两种版本vadd性能差值.jpg)-->
 ![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvadd%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
 
-从差值上可知在执行vadd命令时，master版比rover_compaction_V2_20140709版性能要好，尤其是在vadd请求量接近性能瓶颈时。
+差值绝对值较小，而且正负浮动，说明两个版本vadd命令性能相差不多。
 ###vrem
 下面数据是通过执行10万次vrem命令得到：
 
-<!--![vrem命令对比](../pic/vrem性能对比.jpg)-->
+<!--![vrem命令对比](../pic/vrem命令对比.jpg)-->
 ![vrem命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vrem%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.jpg)
 
 <!--![两种版本vadd性能差值](../pic/两种版本vrem性能差值.jpg)-->
 ![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvrem%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
 
-由以上两图可知两种版本在执行vrem命令时性能相近，从性能差值图可知两种版本间在执行vrem命令时的性能差值相差较小，但rover_compaction_V2_20140709版稍微占优势。
+用benchmark测试vrem命令有一定随机性，所以波动较大，但总体上看两个版本的表现相当。
 
 
 ###vremrange
@@ -238,8 +243,9 @@ db_total_expireds:0
 
 <!--![两种版本vremrange性能差值](../pic/两种版本vremrange性能差值.jpg)-->
 ![两种版本vremrange性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvremrange%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
+
+和前两条命令的对比一样，两个版本间没有明显的优劣之分。
 ****
 ##结论
 * 两种压缩策略性能基本相近
-* 在插入数据(vadd)master版本要比rover_compaction_V2_20140709稍好，但在删除数据时(vrem remrange)时，rover_compaction_V2_20140709表现更好
-* 在测试服务器上，vadd命令包含id flags对数在接近300时vector service工作的性能达到峰值，约120万对每秒
+* 在测试服务器上，vadd命令包含id flags对数在接近50时vector service工作的性能达到峰值，约40万对每秒
