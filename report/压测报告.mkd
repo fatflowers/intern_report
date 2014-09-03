@@ -228,7 +228,7 @@ db_total_expireds:0
 下面数据是通过执行10万次vrem命令得到：
 
 <!--![vrem命令对比](../pic/vrem命令对比.jpg)-->
-![vrem命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vrem%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.jpg)
+![vrem命令对比](https://github.com/sunlei99/intern_report/blob/master/pic/vrem%E5%91%BD%E4%BB%A4%E5%AF%B9%E6%AF%94.jpg)
 
 <!--![两种版本vadd性能差值](../pic/两种版本vrem性能差值.jpg)-->
 ![两种版本vadd性能差值](https://github.com/sunlei99/intern_report/blob/master/pic/%E4%B8%A4%E7%A7%8D%E7%89%88%E6%9C%ACvrem%E6%80%A7%E8%83%BD%E5%B7%AE%E5%80%BC.jpg)
